@@ -1,6 +1,9 @@
 from fastapi import FastAPI, status, HTTPException
-from schemas import Student,StudentOut
+from schemas import Student,StudentUpdate
 from database import students_collection
+from bson import ObjectId
+from bson.errors import InvalidId
+
 app = FastAPI()
 
 dummy_db = []
@@ -31,11 +34,18 @@ async def list_students(country:str|None = None, age:int|None = None):
 
 
 @app.get('/students/{id}')
-async def fetch_student():
-    pass
+async def fetch_student(id:str):
+    try:
+        result = students_collection.find(filter = {'_id':ObjectId(id)}, projection={'_id':0})
+    except InvalidId:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="invalid id")
+    if result.retrieved == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="student not found")
+    return result.next()
 
 @app.patch('/students/{id}')
-async def update_student():
+async def update_student(id:str, student:StudentUpdate):
+
     pass
 
 @app.delete('/students/{id}')
