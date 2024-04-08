@@ -6,7 +6,11 @@ from bson.errors import InvalidId
 
 app = FastAPI()
 
-dummy_db = []
+def update(id:str, key, new_value:str|int):
+    result = students_collection.find_one_and_update({'_id':ObjectId(id)}, {'$set': {key: new_value}})
+    if not result:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="student not found")
+    return result
 
 @app.post('/students', status_code=status.HTTP_201_CREATED)
 async def create_students(student: Student):
@@ -43,10 +47,33 @@ async def fetch_student(id:str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="student not found")
     return result.next()
 
-@app.patch('/students/{id}')
+@app.patch('/students/{id}',status_code=status.HTTP_204_NO_CONTENT)
 async def update_student(id:str, student:StudentUpdate):
+    student_dict = student.model_dump()
+    update_query = {}
 
-    pass
+    if student_dict.get('name'):
+        update_query['name'] = student_dict['name']
+
+    if student_dict.get('age'):
+        update_query['age'] = student_dict['age']
+
+    if student_dict.get('address'):
+        address_dict = student_dict.get('address')
+        if address_dict.get('city'):
+            update_query['address.city'] = address_dict['city']
+        if address_dict.get('country'):
+            update_query['address.country'] = address_dict['country']
+
+    try:
+        result = students_collection.find_one_and_update({'_id':ObjectId(id)}, {'$set': update_query})
+        if not result:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="student not found")
+    except InvalidId:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="invalid id")
+    
+    return
+    
 
 @app.delete('/students/{id}')
 def delete_student():
