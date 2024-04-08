@@ -6,12 +6,6 @@ from bson.errors import InvalidId
 
 app = FastAPI()
 
-def update(id:str, key, new_value:str|int):
-    result = students_collection.find_one_and_update({'_id':ObjectId(id)}, {'$set': {key: new_value}})
-    if not result:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="student not found")
-    return result
-
 @app.post('/students', status_code=status.HTTP_201_CREATED)
 async def create_students(student: Student):
     result = students_collection.insert_one(student.model_dump())
