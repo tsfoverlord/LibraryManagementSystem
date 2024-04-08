@@ -18,6 +18,6 @@ class AddressUpdate(BaseModel):
 
 class StudentUpdate(BaseModel):
     name:str | None = None
-    age:str|None = None
+    age:int|None = None
     address: AddressUpdate|None = None
 
