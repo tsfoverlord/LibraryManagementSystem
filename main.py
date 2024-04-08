@@ -75,6 +75,13 @@ async def update_student(id:str, student:StudentUpdate):
     return
     
 
-@app.delete('/students/{id}')
-def delete_student():
-    pass
+@app.delete('/students/{id}', status_code=status.HTTP_200_OK)
+def delete_student(id:str):
+    try:
+        result =  students_collection.delete_one({'_id': ObjectId(id)})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="student not found")
+    except InvalidId:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="invalid id")
+    return
+    
