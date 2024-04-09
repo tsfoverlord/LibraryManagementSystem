@@ -73,3 +73,6 @@ def delete_student_by_id(id:str)->None:
         raise
     if result.deleted_count == 0:
         raise NotFound
+
+def close_connection():
+    client.close()
