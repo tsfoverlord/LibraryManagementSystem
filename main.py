@@ -4,7 +4,9 @@ from schemas import Student,StudentUpdate
 import database as db
 from bson.errors import InvalidId
 
-app = FastAPI()
+app = FastAPI(title='Task',
+              summary='A CRUD app',
+              )
 
 app.add_middleware(CORSMiddleware,
                    allow_origins=['*'],
@@ -15,17 +17,17 @@ app.add_middleware(CORSMiddleware,
 def shutdown():
     db.close_connection()
 
-@app.post('/students', status_code=status.HTTP_201_CREATED)
+@app.post('/students', status_code=status.HTTP_201_CREATED, tags=['Students'])
 async def create_students(student: Student):
     id = db.add_student(student)
     return {'id': id}
 
-@app.get('/students',status_code=status.HTTP_200_OK)
+@app.get('/students',status_code=status.HTTP_200_OK, tags=['Students'])
 async def list_students(country:str|None = None, age:int|None = None):
     student_list = db.list_students(country, age)
     return {'data': student_list}
 
-@app.get('/students/{id}')
+@app.get('/students/{id}', tags=['Students'])
 async def fetch_student(id:str):
     try:
         student = db.get_student_by_id(id)
@@ -35,7 +37,7 @@ async def fetch_student(id:str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"student with id {id} does not exist")
     return student
 
-@app.patch('/students/{id}',status_code=status.HTTP_204_NO_CONTENT)
+@app.patch('/students/{id}',status_code=status.HTTP_204_NO_CONTENT, tags=['Students'])
 async def update_student(id:str, student:StudentUpdate):
     try:
         db.update_student_by_id(id, student)
@@ -45,7 +47,7 @@ async def update_student(id:str, student:StudentUpdate):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"student with id {id} does not exist")
     return
 
-@app.delete('/students/{id}', status_code=status.HTTP_200_OK)
+@app.delete('/students/{id}', status_code=status.HTTP_200_OK, tags=['Students'])
 def delete_student(id:str):
     try:
         db.delete_student_by_id(id)
