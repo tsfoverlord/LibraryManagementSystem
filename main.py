@@ -4,6 +4,9 @@ import database as db
 from bson.errors import InvalidId
 
 app = FastAPI()
+@app.on_event('shutdown')
+def shutdown():
+    db.close_connection()
 
 @app.post('/students', status_code=status.HTTP_201_CREATED)
 async def create_students(student: Student):
