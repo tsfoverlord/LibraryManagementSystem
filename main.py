@@ -1,9 +1,16 @@
 from fastapi import FastAPI, status, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from schemas import Student,StudentUpdate
 import database as db
 from bson.errors import InvalidId
 
 app = FastAPI()
+
+app.add_middleware(CORSMiddleware,
+                   allow_origins=['*'],
+                   allow_methods=['*'],
+                   allow_headers=['*'])
+
 @app.on_event('shutdown')
 def shutdown():
     db.close_connection()
