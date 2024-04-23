@@ -6,7 +6,10 @@ import database as db
 from bson.errors import InvalidId
 import redis 
 import datetime
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 app = FastAPI(title='Task',
               summary='A CRUD app',
               )
@@ -21,7 +24,7 @@ def shutdown():
     db.close_connection()
 
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), decode_responses=True)
 limit = 100 #100 requests per day from single student
 ttl = datetime.timedelta(days=1) #time to live for request count of each student
 
