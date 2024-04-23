@@ -21,7 +21,8 @@ pip install -r requirements.txt
 
 ### Setting up environment variables
 Create .env file
-Populate the ```DATABASE_URL``` field with MongoDB connection string. (see .example.env)
+Populate the ```DATABASE_URL``` field with MongoDB connection string and ```REDIS_HOST``` and ```REDIS_PORT``` with respective values. (see .example.env)
+
 
 ### Run
 ```bash 
