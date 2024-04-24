@@ -43,9 +43,10 @@ async def rate_limit(request:Request, call_next):
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,content={"detail":f"student with id {student_id} does not exist"})
 
     if r.exists(student_id):
-        r.incr(student_id) #increment request count
-        if int(r.get(student_id)) > limit:
+        if int(r.get(student_id)) + 1 > limit:
             return JSONResponse(status_code=status.HTTP_429_TOO_MANY_REQUESTS,content={"detail":f"{limit} requests allowed per day"})
+        r.incr(student_id) #increment request count
+
     else:
         r.setex(student_id,time=ttl,value=1) #request count expires after 1 day
 
